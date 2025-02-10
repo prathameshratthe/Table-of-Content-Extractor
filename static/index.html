@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic Extraction</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        label { display: block; margin-bottom: 10px; font-weight: bold; }
+        input[type="file"] { margin-bottom: 10px; }
+        button { padding: 10px 15px; font-size: 16px; cursor: pointer; }
+        #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; min-height: 50px; }
+    </style>
+</head>
+<body>
+    <h1>Upload a Text File for Topic Extraction</h1>
+
+    <label for="fileInput">Choose a .txt file:</label>
+    <input type="file" id="fileInput" accept=".txt">
+    <button onclick="uploadFile()">Upload</button>
+
+    <div id="result">Waiting for file upload...</div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            const resultDiv = document.getElementById("result");
+
+            if (!fileInput.files.length) {
+                alert("Please select a file.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            resultDiv.innerText = "Processing... Please wait.";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server error: " + response.status);
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    resultDiv.innerText = "Error: " + data.error;
+                } else {
+                    resultDiv.innerText = "Extracted Topics:\n" + JSON.stringify(data.topics, null, 2);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                resultDiv.innerText = "Error processing file. Please try again.";
+            }
+        }
+    </script>
+</body>
+</html>
