@@ -1,5 +1,7 @@
+os
 fastapi
 uvicorn
 python-dotenv
 langchain-community
+langchain_google_genai
 google-generativeai
